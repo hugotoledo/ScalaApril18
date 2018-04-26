@@ -1,5 +1,7 @@
 package hello
 
+import java.time.LocalDate
+
 object Hello {
   def main(args: Array[String]): Unit = {
     println("Hello, world!")
@@ -19,6 +21,11 @@ object Hello {
 
     val moreNames = Array/*.apply*/("Fred", "Jim", "Sheila")
     println(s"element one of moreNames is ${moreNames(1)}")
+
+    val threeThings = (1, "Banana", LocalDate.now())
+    println(s"date part is ${threeThings._3}")
+    val (n, m, _) = threeThings
+    println(s"thing part is $m")
 
   }
 }
