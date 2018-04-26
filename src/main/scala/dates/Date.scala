@@ -1,5 +1,10 @@
 package dates
 
+import java.sql.SQLException
+
+import scala.annotation.tailrec
+import scala.util.Try
+
 //class Date(d:Int, m: Int, y: Int) {
 //  println(s"making a date with $d, $m, $y")
 ////  var day: Int = _
@@ -11,9 +16,18 @@ package dates
 //}
 
 class Date protected/*private*/(
-    /*private */val day:Int, val month: Int, val year: Int) {
+    /*private */ val day:Int, val month: Int, val year: Int) {
   println(s"making a date with $day, $month, $year")
-  def tomorrow: Date = new Date(day + 1, month, year)
+  @tailrec // not needed
+  final def +/*addDays*/(days: Int): Date = {
+    val daysInMonth = 31 // CHEATING!!!!
+    val daysLeftInMonth = daysInMonth - day
+    if (days <= daysLeftInMonth) new Date(day + days, month, year)
+    else new Date(1, this.month + 1, this.year) + (days - daysLeftInMonth - 1)
+  }
+
+  def tomorrow: Date = this + 1
+//  def tomorrow: Date = new Date(day + 1, month, year)
 //  import Date._
   import Date.{dayName, getDayOfWeek}
   def dayOfWeek: String = dayName(getDayOfWeek(day, month, year))
@@ -24,7 +38,10 @@ class Date protected/*private*/(
 
 object Date {
 //  def makeADate(d: Int, m: Int, y: Int): Date = new Date(d,m,y)
-  def apply(d: Int, m: Int, y: Int): Date = new Date(d,m,y)
+  def apply(d: Int, m: Int, y: Int): Date = {
+    if (d < 1 || m < 1 || y < 1) throw new RuntimeException("Bad values!")
+    new Date(d,m,y)
+  }
 
   def getDayOfWeek(day: Int, month: Int, year: Int): Int = {
     // if month < 3, calculate new month and year, being month + 12 and year - 1
@@ -83,5 +100,21 @@ object TryDate {
     val waffleDay: Date = new Holiday(1, 2, 2018, "Waffle Day")
     println(s"waffle day is $waffleDay")
 //    println(s"waffle day is $waffleDay and is called ${waffleDay.name}")
+
+    val dateMaybe = Try(Date(1, -1, 1))
+    dateMaybe.foreach(println(_))
+
+    try {
+      val d1 = Date(0, 1, 1)
+      println(s"date is $d1")
+    } catch {
+      case _: SQLException => println("Really, got an SQL exception??")
+      case x: RuntimeException => // case like this does "instanceof and cast"
+        println(s"That didn't work, report is ${x.getMessage}")
+    }
+
+//    val inTwoMonths = d.+(62)
+    val inTwoMonths = d + 62
+    println(s"today: $d two months ish $inTwoMonths")
   }
 }
