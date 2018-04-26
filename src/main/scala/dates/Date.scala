@@ -1,6 +1,31 @@
 package dates
 
+//class Date(d:Int, m: Int, y: Int) {
+//  println(s"making a date with $d, $m, $y")
+////  var day: Int = _
+////  var month: Int = _
+////  var year: Int = _
+//  val day: Int = d
+//  val month: Int = m
+//  val year: Int = y
+//}
+
+class Date protected/*private*/(
+    /*private */val day:Int, val month: Int, val year: Int) {
+  println(s"making a date with $day, $month, $year")
+  def tomorrow: Date = new Date(day + 1, month, year)
+//  import Date._
+  import Date.{dayName, getDayOfWeek}
+  def dayOfWeek: String = dayName(getDayOfWeek(day, month, year))
+
+  override def toString: String =
+    s"Date representing $dayOfWeek $day/$month/$year"
+}
+
 object Date {
+//  def makeADate(d: Int, m: Int, y: Int): Date = new Date(d,m,y)
+  def apply(d: Int, m: Int, y: Int): Date = new Date(d,m,y)
+
   def getDayOfWeek(day: Int, month: Int, year: Int): Int = {
     // if month < 3, calculate new month and year, being month + 12 and year - 1
     val (m, y) = if (month < 3) (month + 12, year - 1) else (month, year)
@@ -35,9 +60,28 @@ object Date {
     else "BAD!!!"
 }
 
+class Holiday(d: Int, m: Int, y: Int, val name: String)
+  extends Date(d/* + 1*/, m, y) {
+  override def toString: String =
+    super.toString + ", a holiday called " + name
+}
+
 object TryDate {
   def main(args: Array[String]): Unit = {
     val dow = Date.getDayOfWeek(26, 4, 2018)
     println(s"day is number $dow and is called ${Date.dayName(dow)}")
+//    val d = new Date(26, 4, 2018)
+//    val d = Date.makeADate(26, 4, 2018)
+    val d = Date(26, 4, 2018)
+    println(s"day is ${d}")
+    println(s"tomorrow is ${d.tomorrow}")
+    println(s"day is ${d}")
+
+    println(s"class of d is ${d.getClass.getName} " +
+      s"class of Date is ${Date.getClass.getName}")
+
+    val waffleDay: Date = new Holiday(1, 2, 2018, "Waffle Day")
+    println(s"waffle day is $waffleDay")
+//    println(s"waffle day is $waffleDay and is called ${waffleDay.name}")
   }
 }
